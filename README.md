@@ -123,36 +123,44 @@ ecommerce-realtime-pipeline/
 
 ---
 
-## 🚀 Hướng Dẫn Chạy Hệ Thống
+## 🚀 Quick Start
 
-### 🎯 QUICKSTART (5 phút)
+**👉 Xem hướng dẫn chi tiết:** [docs/SETUP.md](docs/SETUP.md)
 
 ```powershell
-# 1. Clone repository
-git clone <repo-url>
-cd ecommerce-realtime-pipeline
+# 1. Start Infrastructure
+cd infra && docker-compose up -d
 
-# 2. Start Infrastructure
-docker-compose up -d
+# 2. Start Generator API
+cd services/generator-api && npm install && npm start
 
-# 3. Cài dependencies
-cd backend/api-generator && npm install && cd ../..
-pip install -r backend/requirements.txt
-npm install
+# 3. Start Producer
+cd services/producer-poller && pip install -r requirements.txt && python producer.py
 
-# 4. Chạy pipeline (3 terminal riêng)
-# Terminal 1: API Generator
-cd backend/api-generator && npm start
-
-# Terminal 2: Producer Poller
-python backend/producer.py
-
-# Terminal 3: Frontend
-npm run dev
-
-# 5. Mở dashboard
-# http://localhost:5173
+# 4. Start Frontend
+cd frontend && npm install && npm run dev
 ```
+
+**Dashboard:** http://localhost:5173
+
+---
+
+## 📚 Documentation
+
+### Setup & Guides
+- **[SETUP.md](docs/SETUP.md)** - Setup guide cho người mới
+- [QUICKSTART.md](docs/QUICKSTART.md) - Hướng dẫn khởi động nhanh
+- [BACKEND_SETUP.md](docs/BACKEND_SETUP.md) - Cấu hình backend chi tiết
+
+### Architecture
+- [ARCHITECTURE.md](docs/ARCHITECTURE.md) - Kiến trúc hệ thống
+- [DATA_SOURCE_SETUP.md](docs/DATA_SOURCE_SETUP.md) - Cấu hình data source
+- [DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) - Script demo
+
+### Components
+- [Generator API](docs/readmes/GENERATOR_API.md) - REST API documentation
+- [Generator UI](docs/readmes/GENERATOR_UI.md) - React dashboard
+- [Environment](docs/readmes/ENV.md) - Environment config
 
 ---
 
