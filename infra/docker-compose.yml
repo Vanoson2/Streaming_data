@@ -38,6 +38,26 @@ services:
       timeout: 10s
       retries: 5
 
+  # API Event Generator (Node.js)
+  api-generator:
+    build:
+      context: ../services/generator-api
+      dockerfile: Dockerfile
+    container_name: api-generator
+    ports:
+      - "7070:7070"
+    environment:
+      PORT: 7070
+      NODE_ENV: production
+    networks:
+      - realtime-network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:7070/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: unless-stopped
+
   # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
@@ -51,7 +71,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
-      - ./backend/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - realtime-network
     healthcheck:

@@ -1,9 +1,13 @@
 # ============================================================================
 # ENVIRONMENT FILES
 # ============================================================================
+# Ignore all .env files in root and env/ folder
 .env
 .env.local
 .env*.local
+env/.env
+env/.env.local
+env/.env*.local
 # Keep templates for reference
 # .env.example
 # .env.production
@@ -15,6 +19,9 @@
 node_modules
 
 # Backend Python
+.venv/
+venv/
+env/
 backend/venv
 backend/env
 backend/__pycache__
@@ -22,6 +29,10 @@ backend/*.pyc
 backend/*.pyo
 backend/*.pyd
 backend/.Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 
 # ============================================================================
 # BUILD OUTPUT
