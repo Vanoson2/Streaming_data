@@ -148,11 +148,10 @@ cd frontend && npm install && npm run dev
 ## 📚 Documentation
 
 ### Setup & Guides
-- **[SETUP.md](docs/SETUP.md)** - Setup guide cho người mới
-- [QUICKSTART.md](docs/QUICKSTART.md) - Hướng dẫn khởi động nhanh
-- [BACKEND_SETUP.md](docs/BACKEND_SETUP.md) - Cấu hình backend chi tiết
+- **[SETUP.md](docs/SETUP.md)** ⭐ Setup guide cho người mới (bắt đầu từ đây!)
+- [BACKEND_SETUP.md](docs/BACKEND_SETUP.md) - Chi tiết cấu hình backend
 
-### Architecture
+### Architecture & Design
 - [ARCHITECTURE.md](docs/ARCHITECTURE.md) - Kiến trúc hệ thống
 - [DATA_SOURCE_SETUP.md](docs/DATA_SOURCE_SETUP.md) - Cấu hình data source
 - [DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) - Script demo
