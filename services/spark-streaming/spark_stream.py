@@ -17,12 +17,12 @@ import sys
 # ============================================================================
 # CONFIGURATION
 # ============================================================================
-KAFKA_BOOTSTRAP_SERVERS = 'localhost:9092'
+KAFKA_BOOTSTRAP_SERVERS = 'kafka:9092'
 KAFKA_TOPIC = 'events_raw'
 CHECKPOINT_DIR = './checkpoints/spark_stream'
 
 # PostgreSQL configuration
-POSTGRES_URL = 'jdbc:postgresql://localhost:5432/realtime'
+POSTGRES_URL = 'jdbc:postgresql://postgres:5432/realtime'
 POSTGRES_USER = 'app'
 POSTGRES_PASSWORD = 'app'
 POSTGRES_DRIVER = 'org.postgresql.Driver'

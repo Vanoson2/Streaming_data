@@ -29,7 +29,7 @@ API_URL = os.getenv('API_URL', 'http://localhost:7070/gen/event')
 API_TIMEOUT = int(os.getenv('API_TIMEOUT', '5'))  # seconds
 
 # Kafka Configuration
-KAFKA_BOOTSTRAP_SERVERS = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'localhost:9092')
+KAFKA_BOOTSTRAP_SERVERS = os.getenv('KAFKA_BOOTSTRAP_SERVERS', 'kafka:9092')
 KAFKA_TOPIC = os.getenv('KAFKA_TOPIC', 'events_raw')
 
 # Polling Configuration

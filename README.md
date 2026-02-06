@@ -1,10 +1,10 @@
 # 🚀 E-commerce Realtime Data Pipeline
 
-> **Full-stack realtime analytics platform**: Kafka → Spark Structured Streaming → PostgreSQL → React Dashboard
+> **Full-stack realtime analytics platform**: Event-driven architecture với Kafka, Spark Streaming, và React Dashboard
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Docker](https://img.shields.io/badge/Docker-Ready-blue)](https://www.docker.com/)
 [![React](https://img.shields.io/badge/React-18.3-blue)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue)](https://www.typescriptlang.org/)
 [![Apache Kafka](https://img.shields.io/badge/Kafka-7.5-red)](https://kafka.apache.org/)
 [![Apache Spark](https://img.shields.io/badge/Spark-3.5-orange)](https://spark.apache.org/)
 
@@ -12,14 +12,27 @@
 
 ## 📖 Giới Thiệu
 
-Hệ thống xử lý và phân tích dữ liệu **realtime** cho nền tảng thương mại điện tử, bao gồm:
+Hệ thống xử lý và phân tích dữ liệu **realtime** cho nền tảng thương mại điện tử. Xử lý hàng triệu events/giây với độ trễ dưới 1 giây, tính toán KPI theo thời gian thực và hiển thị trên dashboard tương tác.
 
-- 📊 **Dashboard Realtime**: Hiển thị metrics (GMV, order rate, success rate) cập nhật liên tục
-- ⚡ **Stream Processing**: Xử lý hàng triệu events với độ trễ dưới 1 giây
-- 🔄 **Auto-scaling**: Pipeline xử lý tự động scale theo volume dữ liệu
-- 📈 **Multi-timeframe Analytics**: KPI theo 1 phút, 15 phút, 1 giờ, 24 giờ
+### ✨ Features
 
-### Kiến Trúc Tổng Quan
+- 📊 **Realtime Analytics Dashboard** - Hiển thị GMV, order rate, success rate cập nhật liên tục
+- ⚡ **Stream Processing** - Xử lý events với độ trễ < 1s bằng Spark Structured Streaming
+- 🎨 **Event Generator UI** - Control panel để tạo events với custom parameters
+- 🔄 **Auto-scaling Pipeline** - Tự động scale theo volume dữ liệu
+- 📈 **Multi-timeframe KPI** - Analytics theo 1 phút, 15 phút, 1 giờ, 24 giờ
+- 🐳 **Full Docker** - Deploy toàn bộ hệ thống với 1 lệnh
+
+### 🎯 Use Cases
+
+- ✅ **UC03**: Parse & Validate Events
+- ✅ **UC04**: Clean & Deduplicate  
+- ✅ **UC05**: Calculate KPIs (windowing aggregation)
+- ✅ **UC06**: Persist to PostgreSQL
+
+---
+
+## 🏗️ Kiến Trúc Hệ Thống
 
 ```
 ┌─────────────────┐    HTTP GET     ┌──────────────────┐
@@ -53,36 +66,56 @@ Hệ thống xử lý và phân tích dữ liệu **realtime** cho nền tảng 
                                     └──────────────────┘
 ```
 
+**Pipeline Flow:**
+1. **Event Generator** → REST API tạo events với distribution 30-25-35-8-2%
+2. **Producer Poller** → Poll API mỗi 500ms và push vào Kafka
+3. **Kafka Broker** → Message queue (topic: `events_raw`)
+4. **Spark Streaming** → Real-time processing (validate, clean, aggregate)
+5. **PostgreSQL** → Persist events và KPI tables
+6. **React Dashboards** → Visualize realtime analytics
+
 ---
 
-## 🛠️ Yêu Cầu Môi Trường
+## 🛠️ Tech Stack
 
-| Tool | Version | Mục đích |
-|------|---------|----------|
-| **Docker** | 20.10+ | Chạy Kafka, Zookeeper, PostgreSQL |
-| **Docker Compose** | 2.0+ | Orchestration infrastructure |
-| **Node.js** | 20+ | Event Generator API |
-| **Python** | 3.8+ | Producer Poller + Spark |
-| **Java** | 11+ | Spark Runtime (JRE) |
-| **npm** | 10+ | Frontend dependencies |
+### Backend
+- **Apache Kafka 7.5** - Distributed streaming platform
+- **Apache Spark 3.5** - Stream processing với Structured Streaming
+- **PostgreSQL 15** - Relational database
+- **Python 3.11** - Spark jobs & Producer
+- **Node.js 20** - Event Generator REST API
 
-### Cài Đặt Nhanh
+### Frontend  
+- **React 18.3** - UI framework
+- **TypeScript 5.3** - Type safety
+- **Vite 5.4** - Build tool & dev server
+- **TailwindCSS 3.4** - Utility-first CSS
 
-**Windows**:
-```powershell
-choco install docker-desktop nodejs python jdk11
-```
+### DevOps
+- **Docker & Docker Compose** - Containerization (8 services)
+- **Nginx** - Production web server cho frontends
 
-**macOS**:
+---
+
+## 🚀 Quick Start
+
+**Yêu cầu:** Docker Desktop 20.10+
+
 ```bash
-brew install docker node python@3.11 openjdk@11
+# Clone repository
+git clone https://github.com/YOUR_USERNAME/YOUR_REPO.git
+cd YOUR_REPO
+
+# Start tất cả (1 lệnh)
+docker-start.bat
+
+# Chờ 60s, sau đó truy cập:
+# - Generator UI: http://localhost:5174
+# - Dashboard:    http://localhost:5173
+# - API:          http://localhost:7070
 ```
 
-**Linux (Ubuntu)**:
-```bash
-sudo apt update
-sudo apt install docker.io docker-compose nodejs npm python3 python3-pip openjdk-11-jre
-```
+**📚 Hướng dẫn chi tiết:** [docs/QUICKSTART.md](docs/QUICKSTART.md)
 
 ---
 
@@ -91,381 +124,151 @@ sudo apt install docker.io docker-compose nodejs npm python3 python3-pip openjdk
 ```
 ecommerce-realtime-pipeline/
 │
-├── backend/
-│   ├── api-generator/          # REST API sinh events ngẫu nhiên
-│   ├── producer.py             # Poll API → push Kafka
-│   ├── spark_stream.py         # Spark Streaming: Kafka → Postgres
-│   ├── generator.py            # (Legacy - không dùng)
-│   ├── schema.sql              # PostgreSQL schema
-│   └── requirements.txt        # Python dependencies
+├── services/
+│   ├── generator-api/          # Node.js REST API (port 7070)
+│   ├── producer-poller/        # Python Kafka Producer
+│   └── spark-streaming/        # Spark Streaming Jobs
 │
-├── src/                        # React Dashboard
-│   ├── components/
-│   ├── features/
-│   └── lib/
+├── frontend/                   # Analytics Dashboard (port 5173)
+├── generator-ui/               # Generator Control UI (port 5174)
 │
-├── docs/                       # Documentation
-│   ├── QUICKSTART.md
-│   ├── DATA_SOURCE_SETUP.md
-│   ├── BACKEND_SETUP.md
-│   ├── ARCHITECTURE.md
-│   └── GITHUB_SETUP.md
+├── infra/
+│   ├── docker-compose.yml      # 🐳 8 services
+│   └── postgres/init.sql       # Database schema
 │
-├── scripts/                    # Helper scripts
-│   ├── start-pipeline.sh
-│   └── git-init.sh
+├── docs/
+│   ├── QUICKSTART.md           # Setup trong 5 phút
+│   ├── DOCKER_SETUP.md         # Docker chi tiết
+│   └── ARCHITECTURE.md         # System design
 │
-├── docker-compose.yml          # Infrastructure
-├── package.json                # Frontend dependencies
-├── vite.config.ts              # Vite configuration
-└── README.md                   # 👈 BẠN ĐANG ĐỌC FILE NÀY
+├── docker-start.bat            # 🚀 Start script
+├── docker-stop.bat             # 🛑 Stop script
+└── README.md                   # 👈 BẠN ĐANG ĐỌC
 ```
 
 ---
 
-## 🚀 Quick Start
+## 📊 Services Overview
 
-**👉 Xem hướng dẫn chi tiết:** [docs/SETUP.md](docs/SETUP.md)
+| Service | Container | Port | Tech | Description |
+|---------|-----------|------|------|-------------|
+| **Zookeeper** | zookeeper | 2181 | Confluent | Kafka coordination |
+| **Kafka** | kafka | 9092 | Confluent | Event streaming broker |
+| **PostgreSQL** | postgres | 5432 | Alpine | Database |
+| **Generator API** | api-generator | 7070 | Node.js | Event REST API |
+| **Producer** | producer-poller | - | Python | API → Kafka |
+| **Spark** | spark-streaming | - | Python + Java | Stream processing |
+| **Generator UI** | generator-ui | 5174 | React + Nginx | Control dashboard |
+| **Dashboard** | frontend-dashboard | 5173 | React + Nginx | Analytics UI |
 
-```powershell
-# 1. Start Infrastructure
-cd infra && docker-compose up -d
+---
 
-# 2. Start Generator API
-cd services/generator-api && npm install && npm start
+## 🎬 Demo
 
-# 3. Start Producer
-cd services/producer-poller && pip install -r requirements.txt && python producer.py
+### Tạo Events
+```bash
+# Single event
+curl http://localhost:7070/gen/event
 
-# 4. Start Frontend
-cd frontend && npm install && npm run dev
+# Batch 100 events
+curl -X POST http://localhost:7070/gen/emit \
+  -H "Content-Type: application/json" \
+  -d '{"count": 100}'
 ```
 
-**Dashboard:** http://localhost:5173
+### Xem Kafka Stream
+```bash
+docker exec -it kafka kafka-console-consumer \
+  --bootstrap-server localhost:9092 \
+  --topic events_raw \
+  --from-beginning
+```
+
+### Query Database
+```bash
+docker exec -it postgres psql -U app -d realtime -c \
+  "SELECT event_type, COUNT(*) FROM events_clean GROUP BY event_type;"
+```
 
 ---
 
 ## 📚 Documentation
 
-### Setup & Guides
-- **[SETUP.md](docs/SETUP.md)** ⭐ Setup guide cho người mới (bắt đầu từ đây!)
-- [BACKEND_SETUP.md](docs/BACKEND_SETUP.md) - Chi tiết cấu hình backend
-
-### Architecture & Design
-- [ARCHITECTURE.md](docs/ARCHITECTURE.md) - Kiến trúc hệ thống
-- [DATA_SOURCE_SETUP.md](docs/DATA_SOURCE_SETUP.md) - Cấu hình data source
-- [DEMO_SCRIPT.md](docs/DEMO_SCRIPT.md) - Script demo
-
-### Components
-- [Generator API](docs/readmes/GENERATOR_API.md) - REST API documentation
-- [Generator UI](docs/readmes/GENERATOR_UI.md) - React dashboard
-- [Environment](docs/readmes/ENV.md) - Environment config
-
----
-
-### 📋 Chi Tiết Từng Bước
-
-#### **Bước 1: Khởi Động Infrastructure**
-
-```powershell
-docker-compose up -d
-```
-
-Chờ 30-60 giây để Kafka khởi động hoàn toàn:
-
-```powershell
-# Kiểm tra status
-docker ps
-
-# Kiểm tra Kafka ready
-docker logs kafka | Select-String "started"
-```
-
-**Services đang chạy**:
-- Zookeeper (port 2181)
-- Kafka Broker (port 9092)
-- PostgreSQL (port 5432)
-
-#### **Bước 2: Chạy API Generator**
-
-```powershell
-cd backend/api-generator
-npm install
-npm start
-```
-
-**Test API**:
-```powershell
-curl http://localhost:7070/gen/event
-```
-
-#### **Bước 3: Chạy Producer Poller**
-
-Mở terminal mới:
-
-```powershell
-pip install -r backend/requirements.txt
-python backend/producer.py
-```
-
-**Log thành công**:
-```
-✅ Connected to Kafka: localhost:9092
-📥 Pulled event from API: payment_success | Order: ORD-...
-📤 Produced to Kafka: topic=events_raw | partition=1 | offset=42
-```
-
-#### **Bước 4: Chạy Spark Streaming**
-
-Mở terminal mới:
-
-```powershell
-python backend/spark_stream.py
-```
-
-**Log thành công**:
-```
-✅ Spark Streaming started
-✅ Reading from Kafka: events_raw
-📊 Processing batch 1 with 100 events
-✅ Written to PostgreSQL
-```
-
-#### **Bước 5: Chạy Frontend**
-
-Mở terminal mới:
-
-```powershell
-npm install
-npm run dev
-```
-
-Mở browser: **http://localhost:5173**
-
----
-
-## 🎬 Demo Nhanh (Cho Bảo Vệ Đồ Án)
-
-### Scenario 1: Realtime Pipeline Hoàn Chỉnh
-
-```powershell
-# 1. Start tất cả services (3-5 phút)
-docker-compose up -d
-cd backend/api-generator && npm start &
-python backend/producer.py &
-python backend/spark_stream.py &
-npm run dev
-
-# 2. Mở dashboard: http://localhost:5173
-# 3. Giải thích:
-#    - Events từ API Generator → Producer → Kafka
-#    - Spark đọc Kafka → xử lý → ghi Postgres
-#    - Dashboard query Postgres → hiển thị realtime
-```
-
-### Scenario 2: Kiểm Tra Kafka Consumer
-
-```powershell
-docker exec -it kafka kafka-console-consumer \
-  --bootstrap-server localhost:9092 \
-  --topic events_raw \
-  --from-beginning \
-  --max-messages 10
-```
-
-### Scenario 3: Kiểm Tra PostgreSQL
-
-```powershell
-docker exec -it postgres psql -U app -d realtime
-
-# Query KPI
-SELECT * FROM kpi_1m ORDER BY window_start DESC LIMIT 5;
-
-# Query events
-SELECT event_type, COUNT(*) FROM events_clean GROUP BY event_type;
-```
-
-### Scenario 4: Stop Toàn Bộ
-
-```powershell
-# Stop Python processes (Ctrl+C trong từng terminal)
-# Stop Node.js (Ctrl+C)
-# Stop Docker
-docker-compose down
-```
-
----
-
-## 📊 Các Use Cases Đã Implement
-
-| Use Case | Mô tả | Status |
-|----------|-------|--------|
-| **UC03** | Parse & Validate Events | ✅ Hoàn thành |
-| **UC04** | Clean & Deduplicate | ✅ Hoàn thành |
-| **UC05** | Calculate KPIs (1 min window) | ✅ Hoàn thành |
-| **UC06** | Persist to PostgreSQL | ✅ Hoàn thành |
-
----
-
-## 🔧 Configuration
-
-### Environment Variables
-
-**Producer Poller** (`backend/.env`):
-```env
-API_URL=http://localhost:7070/gen/event
-KAFKA_BOOTSTRAP_SERVERS=localhost:9092
-KAFKA_TOPIC=events_raw
-POLL_INTERVAL_MS=500
-```
-
-**Spark Streaming**:
-```python
-# backend/spark_stream.py
-KAFKA_BOOTSTRAP_SERVERS = "localhost:9092"
-POSTGRES_HOST = "localhost"
-POSTGRES_PORT = 5432
-POSTGRES_DB = "realtime"
-```
-
-**Frontend** (`vite.config.ts`):
-```typescript
-server: {
-  port: 5173,
-  proxy: {
-    '/api': 'http://localhost:8080'  // Nếu có API backend
-  }
-}
-```
+- **[QUICKSTART.md](docs/QUICKSTART.md)** ⚡ - Setup trong 5 phút
+- **[DOCKER_SETUP.md](docs/DOCKER_SETUP.md)** 🐳 - Docker guide đầy đủ
+- **[ARCHITECTURE.md](docs/ARCHITECTURE.md)** 🏗️ - System architecture & design
 
 ---
 
 ## 🐛 Troubleshooting
 
-### Kafka Connection Error
-
-**Triệu chứng**: `NoBrokersAvailable`
-
-**Giải pháp**:
-```powershell
-docker-compose restart kafka
-# Chờ 30s
-docker logs kafka | Select-String "started"
+**Services không start:**
+```bash
+cd infra
+docker-compose ps        # Check status
+docker-compose logs -f   # View logs
 ```
 
-### PostgreSQL Connection Error
-
-**Triệu chứng**: `Connection refused to localhost:5432`
-
-**Giải pháp**:
-```powershell
-docker ps  # Check postgres running
-docker logs postgres
-
-# Nếu cần init lại schema
-docker exec -it postgres psql -U app -d realtime -f /docker-entrypoint-initdb.d/init.sql
+**Reset toàn bộ:**
+```bash
+cd infra
+docker-compose down -v   # Delete all data
+docker-compose up -d --build
 ```
 
-### Frontend Build Error
-
-**Triệu chứng**: `Module not found`
-
-**Giải pháp**:
-```powershell
-rm -rf node_modules package-lock.json
-npm install
-npm run dev
-```
+**👉 Chi tiết:** [docs/QUICKSTART.md#troubleshooting](docs/QUICKSTART.md#troubleshooting)
 
 ---
 
-## 📚 Documentation Chi Tiết
+## 📝 Development
 
-- [📖 QUICKSTART.md](docs/QUICKSTART.md) - Hướng dẫn chạy nhanh
-- [🔧 DATA_SOURCE_SETUP.md](docs/DATA_SOURCE_SETUP.md) - Thiết lập nguồn dữ liệu (API → Kafka)
-- [⚙️ BACKEND_SETUP.md](docs/BACKEND_SETUP.md) - Spark Streaming & PostgreSQL
-- [🏗️ ARCHITECTURE.md](docs/ARCHITECTURE.md) - Kiến trúc hệ thống
-- [🐙 GITHUB_SETUP.md](docs/GITHUB_SETUP.md) - Push lên GitHub
+### Local Development
+```bash
+# Stop production containers
+cd infra && docker-compose stop generator-ui
 
----
-
-## 🔄 Chế Độ MOCK vs REAL
-
-### MOCK Mode (Default)
-
-API Generator tự tạo dữ liệu ngẫu nhiên - phù hợp demo:
-
-```javascript
-// backend/api-generator/server.js
-const eventType = weightedRandom(EVENT_TYPES);  // Random events
+# Run dev mode with hot reload
+cd generator-ui && npm run dev
 ```
 
-### REAL Mode (Tích Hợp API Thật)
-
-Sửa `backend/producer.py` để call API thật thay vì API Generator:
-
-```python
-# Thay vì
-API_URL = 'http://localhost:7070/gen/event'
-
-# Thành
-API_URL = 'https://your-real-api.com/events'
-```
+### Add New Service
+1. Tạo Dockerfile trong `services/your-service/`
+2. Add service vào `infra/docker-compose.yml`
+3. Rebuild: `docker-compose up -d --build your-service`
 
 ---
 
-## 🎓 Tech Stack
+## 🤝 Contributing
 
-### Backend
-- **Apache Kafka 7.5.0** - Distributed streaming platform
-- **Apache Spark 3.5.0** - Stream processing engine
-- **PostgreSQL 15** - Relational database
-- **Python 3.11** - Scripting & Spark jobs
-- **Node.js 20** - Event Generator API
-
-### Frontend
-- **React 18.3** - UI framework
-- **TypeScript 5.3** - Type safety
-- **Vite 5.4** - Build tool
-- **TailwindCSS 3.4** - Styling
-
-### DevOps
-- **Docker & Docker Compose** - Containerization
-- **Git** - Version control
-
----
-
-## 📝 TODO / Future Enhancements
-
-- [ ] Thêm API backend cho dashboard (hiện tại query trực tiếp Postgres từ frontend)
-- [ ] Thêm authentication (JWT)
-- [ ] Thêm monitoring (Prometheus + Grafana)
-- [ ] Thêm alerting (khi error rate > threshold)
-- [ ] Scale Kafka lên 3 brokers
-- [ ] Thêm unit tests (Jest, pytest)
-
----
-
-## 👥 Contributors
-
-- **Your Name** - Initial work
+Contributions are welcome! Please:
+1. Fork repository
+2. Create feature branch: `git checkout -b feature/AmazingFeature`
+3. Commit changes: `git commit -m 'Add AmazingFeature'`
+4. Push to branch: `git push origin feature/AmazingFeature`
+5. Open Pull Request
 
 ---
 
 ## 📄 License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+MIT License - see [LICENSE](LICENSE) file
 
 ---
 
 ## 🙏 Acknowledgments
 
 - Apache Kafka & Spark communities
-- React & Vite teams
-- Docker team
+- React & Vite teams  
+- Docker & Confluent
 
 ---
 
-**⭐ Nếu project hữu ích, đừng quên star repo!**
+## 📧 Contact
 
-**📧 Contact**: your.email@example.com
+**Author**: Your Name  
+**Email**: your.email@example.com  
+**GitHub**: [@yourusername](https://github.com/yourusername)
+
+---
+
+**⭐ Star repo nếu project hữu ích!**
